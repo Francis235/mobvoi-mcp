@@ -1,9 +1,11 @@
 ![Mobvoi Logo](https://raw.githubusercontent.com/mobvoi/mobvoi-mcp/master/.assets/logo.jpeg)
+<p align="center">
 <a href="https://pypi.org/project/mobvoi-mcp/"><img src="https://img.shields.io/badge/pypi-mobvoimcp-green" alt="version"></a>
 <a href="https://openapi.moyin.com/index/"><img src="https://img.shields.io/badge/openapi-SeqMonkey-orange" alt="version"></a>
 <a href="https://www.moyin.com/"><img src="https://img.shields.io/badge/魔音工坊-出门问问-red" alt="version"></a>
 <a href="https://www.dupdub.com/"><img src="https://img.shields.io/badge/dupdub-Mobvoi-yellow" alt="version"></a>
 <a href="https://sparkaudio.github.io/spark-tts/"><img src="https://img.shields.io/badge/github-sparktts-blue" alt="version"></a>
+</p>
 
 <p align="center">
   Official Mobvoi <a href="https://github.com/modelcontextprotocol">Model Context Protocol (MCP)</a> server that enables interaction with Mobvoi powerful Text to Speech, Voice Clone APIs. This server allows MCP clients like <a href="https://www.cursor.so">Cursor</a>, <a href="https://www.anthropic.com/claude">Claude Desktop</a>, <a href="https://cline.bot/">Cline</a> </a>, <a href="https://windsurf.com/editor">Windsurf</a> and other Client to generate speech, clone voices, and more. The mobvoi-tts-mcp server is built based on Python. Our PyPI package is published at Pypi, you can click on <a href="https://pypi.org/project/mobvoi-mcp/">Pypi</a> to view the latest version.
