@@ -45,7 +45,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build]
-packages = ["mobvoi_mcp"]
+packages = ["mobvoi_mcp", "mobvoi_mcp.mobvoi"]
 
 [tool.hatch.version]
 path = "mobvoi_mcp/__init__.py"

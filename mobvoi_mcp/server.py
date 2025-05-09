@@ -16,8 +16,8 @@ import httpx
 from dotenv import load_dotenv
 from mcp.server.fastmcp import FastMCP
 from mcp.types import TextContent
-from mobvoi import Mobvoi
-from mobvoi import play
+from mobvoi_mcp.mobvoi import Mobvoi
+from mobvoi_mcp.mobvoi import play
 from mobvoi_mcp.utils import (
     make_error,
     make_output_path,
