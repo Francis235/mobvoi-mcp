@@ -6,7 +6,7 @@
 <a href="https://sparkaudio.github.io/spark-tts/"><img src="https://img.shields.io/badge/github-sparktts-blue" alt="version"></a>
 
 <p align="center">
-  Official Mobvoi TTS <a href="https://github.com/modelcontextprotocol">Model Context Protocol (MCP)</a> server that enables interaction with Mobvoi powerful Text to Speech, Voice Clone APIs. This server allows MCP clients like <a href="https://www.cursor.so">Cursor</a>, <a href="https://www.anthropic.com/claude">Claude Desktop</a>, <a href="https://cline.bot/">Cline</a> </a>, <a href="https://windsurf.com/editor">Windsurf</a> and other Client to generate speech, clone voices, and more. The mobvoi-tts-mcp server is built based on Python. Our PyPI package is published at Pypi, you can click on <a href="https://pypi.org/project/mobvoi-tts-mcp/">Pypi</a> to view the latest version.
+  Official Mobvoi <a href="https://github.com/modelcontextprotocol">Model Context Protocol (MCP)</a> server that enables interaction with Mobvoi powerful Text to Speech, Voice Clone APIs. This server allows MCP clients like <a href="https://www.cursor.so">Cursor</a>, <a href="https://www.anthropic.com/claude">Claude Desktop</a>, <a href="https://cline.bot/">Cline</a> </a>, <a href="https://windsurf.com/editor">Windsurf</a> and other Client to generate speech, clone voices, and more. The mobvoi-tts-mcp server is built based on Python. Our PyPI package is published at Pypi, you can click on <a href="https://pypi.org/project/mobvoi-mcp/">Pypi</a> to view the latest version.
 </p>
 
 ## Prerequisite
@@ -17,7 +17,7 @@
 
 ## What can Mobvoi MCP do?
 
-Mobvoi TTS MCP currently supports the following functions:
+Mobvoi MCP currently supports the following functions:
 
 1. Voice Clone: Clone the voice according to the URL audio file link or the local audio file provided by you, and return the speaker ID. You can use this speaker ID to generate speech.
 2. Speech Synthesis: You can specify the speaker ID to generate speech from the specified text content. In addition, you can also adjust speech attributes such as speech speed and volume. For detailed information, please refer to the documentation of our [Mobvoi Sequence Monkey open platform TTS part](https://openapi.moyin.com/document?name=%E8%AF%AD%E9%9F%B3%E5%90%88%E6%88%90%EF%BC%88TTS%EF%BC%89).
@@ -28,7 +28,7 @@ Mobvoi TTS MCP currently supports the following functions:
 Go to Cursor -> Cursor Settings -> MCP, click `Add new global MCP server`, and mcp.json will open, paste the following config content:
 
 ```
-"MobvoiTTS": {
+"Mobvoi": {
         "command": "uvx",
         "args": [
           "mobvoi-mcp"
@@ -45,7 +45,7 @@ Go to Cursor -> Cursor Settings -> MCP, click `Add new global MCP server`, and m
 Go to Claude Desktop -> Settings -> Developer, click `Edit Config` and open `claude_desktop_config.json`, paste the following config content:
 
 ```
-"MobvoiTTS": {
+"Mobvoi": {
         "command": "uvx",
         "args": [
           "mobvoi-mcp"
@@ -62,7 +62,7 @@ Go to Claude Desktop -> Settings -> Developer, click `Edit Config` and open `cla
 Install Cline extension on VSCode EXTENSIONS, and go to Cline -> MCP Servers -> Installed, click `Config MCP Servers` and  `cline_mcp_settings.json` will be opened, paste the following config content:
 
 ```
-"MobvoiTTS": {
+"Mobvoi": {
         "command": "uvx",
         "args": [
           "mobvoi-mcp"
@@ -82,7 +82,7 @@ For MacOS and Linux systems, you can refer to the above for configuration. We ha
 If you want to conduct tests based on the source code or perform secondary development based on this repository, you can configure it in the following way:
 
 ```
-"MobvoiTTSLocal": {
+"MobvoiLocal": {
       "disabled": false,
       "timeout": 60,
       "command": "uv",
@@ -107,13 +107,13 @@ Take Cline as an example, and the configuration of other clients is similar.
 1. Try cloning a voice from your audio file(local or remote), enter the following content in the Cursor agent mode: "[https://tc-nj-backend-pub-cdn.mobvoi.com/subtitles/wav/9e5d439e0e9142966037fb80fe9e0d8e.wav](https://tc-nj-backend-pub-cdn.mobvoi.com/subtitles/wav/9e5d439e0e9142966037fb80fe9e0d8e.wav), clone this voice"
 2. Specify the speaker, synthesize speech from the text and play it aloud. Prompt the model like the following: "Use the sound cloned just now to broadcast: 'Welcome to experience Mobvoi TTS MCP."
 3. A demonstration video:
-   ![TTS Demo]([https://github.com/user-attachments/assets/c8fd1be2-4e96-4662-9648-febe3f7ce0db](https://raw.githubusercontent.com/mobvoi/mobvoi-mcp/master/.assets/20250507-134522.gif))
+   ![TTS Demo](https://raw.githubusercontent.com/mobvoi/mobvoi-mcp/master/.assets/Mobvoi_TTS_Demo.gif)
 
 ## Troubleshooting
 
 ### spawn uvx ENOENT
 
-If you encounter the error "MCP Mobvoi TTS: spawn uvx ENOENT", confirm its absolute path by running this command in your terminal:
+If you encounter the error "MCP Mobvoi: spawn uvx ENOENT", confirm its absolute path by running this command in your terminal:
 `which uvx`
 Once you obtain the absolute path (e.g., /usr/local/bin/uvx), update your configuration to use that path (e.g., "command": "/usr/local/bin/uvx"). This ensures that the correct executable is referenced.
 
@@ -122,12 +122,12 @@ Once you obtain the absolute path (e.g., /usr/local/bin/uvx), update your config
 If you encounter this error, this indicates that there is a problem with your network. If you are in mainland China, we strongly recommend that you configure extra pypi sources in the following way:
 
 ```
-"MobvoiTTS": {
+"Mobvoi": {
         ...
         "args": [
           "--index", 
           "https://pypi.tuna.tsinghua.edu.cn/simple",
-          "mobvoi-tts-mcp"
+          "mobvoi-mcp"
         ],
        ...
       },
@@ -137,21 +137,21 @@ Note that the extra pypi source needs to be configured at the very front of the 
 
 ### Unable to synchronize the latest PyPI package
 
-If you encounter this situation, it may be caused by the following reasons: 1) Network problems; 2) Cache problems; 3) The specified mirror source has not synchronized the mobvoi-tts-mcp package.
-If you are using a mirror source, you should first check whether the mobvoi-tts-mcp package is synchronized on the mirror source you are using, in the following way:
-`pip index versions --index-url https://pypi.tuna.tsinghua.edu.cn/simple mobvoi-tts-mcp`
-If you can see that the LATEST version number is consistent with that on PyPI, you can use the mirror source to update the latest mobvoi-tts-mcp package. Otherwise, you can only use https://pypi.org/simple for the update. Usually, after a new package is released on PyPI, there will be a delay of dozens of minutes for the mirror source to synchronize.
+If you encounter this situation, it may be caused by the following reasons: 1) Network problems; 2) Cache problems; 3) The specified mirror source has not synchronized the mobvoi-mcp package.
+If you are using a mirror source, you should first check whether the mobvoi-mcp package is synchronized on the mirror source you are using, in the following way:
+`pip index versions --index-url https://pypi.tuna.tsinghua.edu.cn/simple mobvoi-mcp`
+If you can see that the LATEST version number is consistent with that on PyPI, you can use the mirror source to update the latest mobvoi-mcp package. Otherwise, you can only use https://pypi.org/simple for the update. Usually, after a new package is released on PyPI, there will be a delay of dozens of minutes for the mirror source to synchronize.
 At the same time, you can refer to the following configuration to update and clear the cache.
 
 ```
-"MobvoiTTS": {
+"Mobvoi": {
         ...
         "args": [
           "--upgrade",
           "--no-cache-dir",
           "--index", 
           "https://pypi.tuna.tsinghua.edu.cn/simple",
-          "mobvoi-tts-mcp"
+          "mobvoi-mcp"
         ],
        ...
       },
