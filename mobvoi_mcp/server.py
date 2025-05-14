@@ -207,6 +207,54 @@ def play_audio(input_file_path: str) -> TextContent:
     play(open(file_path, "rb").read(), use_ffmpeg=False)
     return TextContent(type="text", text=f"Successfully played audio file: {file_path}")
 
+@mcp.tool(
+    description="""Generate a video from a given image URL and an audio URL. If a person is in the image, the video will be a talking head video, driven by the audio.
+    It will consume some time to generate the video, wait with patience.
+    It will return a text message indicating that the task is completed and the video is saved to the output directory.
+    ⚠️ COST WARNING: This tool makes an API call to Mobvoi which may incur costs. Only use when explicitly requested by the user.
+
+    Args:
+        image_url: The URL of the image to use in the video.
+        audio_url: The URL of the audio to use in the video.
+        output_dir: The directory to save the generated video, you can send the absolute path of the current working directory.
+                    The result will be saved into $output_dir/image_to_video/$task_id/result.mp4.
+
+    Returns:
+        A text message indicating the success of the video generation task.
+    """
+)
+def image_to_video(image_url: str, audio_url: str, output_dir: str):
+    logger.info(f"image_to_video is called.")
+
+    try:
+        video_path, result_url = client.image_to_video(image_url=image_url, audio_url=audio_url, output_dir=output_dir)
+        return TextContent(type="text", text=f"Success. Video saved as: {video_path}. Result url: {result_url}")
+    except Exception as e:
+        logger.exception(f"Error in image_to_video: {str(e)}")
+        raise
+
+@mcp.tool(
+    description="""Get a list of supported languages for video translation.
+
+    This function is still work in progress, use with caution.
+    The language list format looks like:
+    chinese (zh), True, False
+
+    * The first column is the language name.
+    * The second column is the language code. 
+    * The third column is whether the language can be used as source language.
+    * The fourth column is whether the language can be used as target language.
+
+    Returns:
+        A text message indicating the information of supported languages for video translation
+
+    """
+)
+def video_translate_language_list():
+    logger.info(f"video_translate_language_list is called.")
+    language_list = client.video_translate_get_language_list()
+    return TextContent(type="text", text=language_list)
+
 def main():
     logger.info("Starting MCP server")
     mcp.run()
