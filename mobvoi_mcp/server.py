@@ -233,6 +233,34 @@ def image_to_video(image_url: str, audio_url: str, output_dir: str):
         logger.exception(f"Error in image_to_video: {str(e)}")
         raise
 
+
+@mcp.tool(
+    description="""This tool aims to perform the voice over task, which generates a video from a given video URL and an audio URL.
+    The result video will be a talking head video, with lip sync driven by the audio.
+    It will consume some time to generate the video, wait with patience.
+    It will return a text message indicating that the task is completed and the video is saved to the output directory.
+    ⚠️ COST WARNING: This tool makes an API call to Mobvoi which may incur costs. Only use when explicitly requested by the user.
+
+    Args:
+        video_url: The URL of the video to use as the base.
+        audio_url: The URL of the audio to use in the video.
+        output_dir: The directory to save the generated video, you can send the absolute path of the current working directory.
+                    The result will be saved into $output_dir/image_to_video/$task_id/result.mp4.
+
+    Returns:
+        A text message indicating the success of the video generation task.
+    """
+)
+def voice_over(video_url: str, audio_url: str, output_dir: str):
+    logger.info(f"voice_over is called.")
+
+    try:
+        video_path, cover_image_path, result_url, cover_image_url = client.voice_over(video_url=video_url, audio_url=audio_url, output_dir=output_dir)
+        return TextContent(type="text", text=f"Success. Video saved as: {video_path}. Result url: {result_url}. Cover image saved as: {cover_image_path}. Cover image url: {cover_image_url}.")
+    except Exception as e:
+        logger.exception(f"Error in voice_over: {str(e)}")
+        raise
+
 @mcp.tool(
     description="""Get a list of supported languages for video translation.
 

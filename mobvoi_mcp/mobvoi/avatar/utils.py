@@ -24,7 +24,7 @@ class ImageToVideoRequest(BaseModel):
 
 class VoiceOverRequest(BaseModel):
     videoUrl: str
-    audioUrl: str
+    wavUrl: str
 
 class VideoTranslateRequest(BaseModel):
     videoUrl: str

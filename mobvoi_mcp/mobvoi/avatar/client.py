@@ -153,7 +153,7 @@ class AvatarClient:
 
         voice_over_req = VoiceOverRequest(
             videoUrl=video_url,
-            audioUrl=audio_url
+            wavUrl=audio_url
         )
         voice_over_result = voice_over_serv.call_service(voice_over_req.model_dump())
         if voice_over_result is None:
