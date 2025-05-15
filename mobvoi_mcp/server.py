@@ -1,23 +1,23 @@
-import logging
-import httpx
-import typing
-import os, sys
-import mobvoi_mcp
 import asyncio
+import logging
+import os
 import time
+import typing
 from collections import deque
+
+from dotenv import load_dotenv
+from mcp.server.fastmcp import FastMCP
+from mcp.types import TextContent
+
+import mobvoi_mcp
+from api_client import ApiClient, download_file
+from utils import LanguageTable
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-logger.info(f"mobvoi-tts-mcp version: {mobvoi_mcp.__version__}")
+logger.info(f"mobvoi-mcp version: {mobvoi_mcp.__version__}")
 
-import httpx
-from dotenv import load_dotenv
-from mcp.server.fastmcp import FastMCP
-from mcp.types import TextContent
-from api_client import ApiClient, download_file
-from avatar.language import LanguageTable
 
 load_dotenv()
 app_key = os.getenv("APP_KEY")
@@ -269,8 +269,10 @@ def query_video_dubbing(task_id: str, output_dir: str = ""):
         "taskUuid": task_id
     }
 
+    header = {"Content-Type": "application/json"}
+
     try:
-        response = api_client.get("avatar.query_video_dubbing", request=task_id_req)
+        response = api_client.get("avatar.query_video_dubbing", request=task_id_req, headers=header)
         res = response.get("data", None)
         logger.info(f"query_video_dubbing response: {res}")
         if res is None:
