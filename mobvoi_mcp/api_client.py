@@ -1,9 +1,10 @@
-import time
-import hashlib
-import httpx
-import os
-from pathlib import Path
 import concurrent.futures
+import hashlib
+import os
+import time
+from pathlib import Path
+
+import httpx
 
 
 def download_file_multi_thread(url: str, output_path: str, num_threads: int = 4, chunk_size: int = 1024*1024):
@@ -161,7 +162,7 @@ class ApiClient:
             signature_info = {}
         return signature_info
 
-    def post(self, service: str, request: dict = {}, headers: dict = {}, path: str = ""):
+    def post(self, service: str, request: dict = {}, headers: dict = {}, file: dict = {}, path: str = ""):
         post_header = self.__parse_signature()
         post_header.update(headers)
 
@@ -169,8 +170,8 @@ class ApiClient:
         if path:
             url = f"{url}/{path}"
 
-        response = self.__client.post(url, headers=post_header, json=request)
-        return response.json()
+        response = self.__client.post(url, headers=post_header, json=request, files=file)
+        return response
 
     def get(self, service: str, request: dict = {}, headers: dict = {}, path: str = ""):
         get_header = self.__parse_signature()
@@ -181,4 +182,4 @@ class ApiClient:
             url = f"{url}/{path}"
 
         response = self.__client.get(url, headers=get_header, params=request)
-        return response.json()
+        return response

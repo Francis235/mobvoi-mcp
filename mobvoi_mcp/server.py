@@ -1,23 +1,23 @@
-import logging
-import httpx
-import typing
-import os, sys
-import mobvoi_mcp
 import asyncio
+import logging
+import os
 import time
+import typing
 from collections import deque
+
+from dotenv import load_dotenv
+from mcp.server.fastmcp import FastMCP
+from mcp.types import TextContent
+
+import mobvoi_mcp
+from api_client import ApiClient, download_file
+from utils import LanguageTable
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-logger.info(f"mobvoi-tts-mcp version: {mobvoi_mcp.__version__}")
+logger.info(f"mobvoi-mcp version: {mobvoi_mcp.__version__}")
 
-import httpx
-from dotenv import load_dotenv
-from mcp.server.fastmcp import FastMCP
-from mcp.types import TextContent
-from api_client import ApiClient, download_file
-from avatar.language import LanguageTable
 
 load_dotenv()
 app_key = os.getenv("APP_KEY")
@@ -150,7 +150,7 @@ def photo_drive_avatar(image_url: str, audio_url: str):
         "audioUrl": audio_url
     }
     try:
-        res = api_client.post("avatar.photo_drive_avatar", request)
+        res = api_client.post("avatar.photo_drive_avatar", request).json()
         if res is None:
             raise Exception("Failed to call photo drive avatar service")
         task_id = res.get("data", None)
@@ -182,7 +182,7 @@ def photo_drive_avatar(image_url: str, audio_url: str):
 def query_photo_drive_avatar(task_id: str, output_dir: str = ""):
     logger.info(f"query_photo_drive_avatar is called.")
     try:
-        response = api_client.get("avatar.query_photo_drive_avatar", path=task_id)
+        response = api_client.get("avatar.query_photo_drive_avatar", path=task_id).json()
         res = response.get("data", None)
         logger.info(f"query_photo_drive_avatar response: {res}")
         if res is None:
@@ -231,7 +231,7 @@ def video_dubbing(video_url: str, audio_url: str):
     }
 
     try:
-        res = api_client.post("avatar.video_dubbing", request)
+        res = api_client.post("avatar.video_dubbing", request).json()
         logger.info(f"video_dubbing response: {res}")
         if res is None:
             raise Exception("Failed to call video dubbing service")
@@ -269,8 +269,10 @@ def query_video_dubbing(task_id: str, output_dir: str = ""):
         "taskUuid": task_id
     }
 
+    header = {"Content-Type": "application/json"}
+
     try:
-        response = api_client.get("avatar.query_video_dubbing", request=task_id_req)
+        response = api_client.get("avatar.query_video_dubbing", request=task_id_req, headers=header).json()
         res = response.get("data", None)
         logger.info(f"query_video_dubbing response: {res}")
         if res is None:
