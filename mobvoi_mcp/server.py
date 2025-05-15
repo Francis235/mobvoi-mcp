@@ -150,7 +150,7 @@ def photo_drive_avatar(image_url: str, audio_url: str):
         "audioUrl": audio_url
     }
     try:
-        res = api_client.post("avatar.photo_drive_avatar", request)
+        res = api_client.post("avatar.photo_drive_avatar", request).json()
         if res is None:
             raise Exception("Failed to call photo drive avatar service")
         task_id = res.get("data", None)
@@ -182,7 +182,7 @@ def photo_drive_avatar(image_url: str, audio_url: str):
 def query_photo_drive_avatar(task_id: str, output_dir: str = ""):
     logger.info(f"query_photo_drive_avatar is called.")
     try:
-        response = api_client.get("avatar.query_photo_drive_avatar", path=task_id)
+        response = api_client.get("avatar.query_photo_drive_avatar", path=task_id).json()
         res = response.get("data", None)
         logger.info(f"query_photo_drive_avatar response: {res}")
         if res is None:
@@ -231,7 +231,7 @@ def video_dubbing(video_url: str, audio_url: str):
     }
 
     try:
-        res = api_client.post("avatar.video_dubbing", request)
+        res = api_client.post("avatar.video_dubbing", request).json()
         logger.info(f"video_dubbing response: {res}")
         if res is None:
             raise Exception("Failed to call video dubbing service")
@@ -272,7 +272,7 @@ def query_video_dubbing(task_id: str, output_dir: str = ""):
     header = {"Content-Type": "application/json"}
 
     try:
-        response = api_client.get("avatar.query_video_dubbing", request=task_id_req, headers=header)
+        response = api_client.get("avatar.query_video_dubbing", request=task_id_req, headers=header).json()
         res = response.get("data", None)
         logger.info(f"query_video_dubbing response: {res}")
         if res is None:
