@@ -16,49 +16,26 @@ import httpx
 from dotenv import load_dotenv
 from mcp.server.fastmcp import FastMCP
 from mcp.types import TextContent
-from mobvoi_mcp.mobvoi import Mobvoi
-from mobvoi_mcp.mobvoi import play
-from mobvoi_mcp.utils import (
-    make_error,
-    make_output_path,
-    make_output_file,
-    handle_input_file
-)
+from api_client import ApiClient, download_file
+from avatar.language import LanguageTable
 
 load_dotenv()
 app_key = os.getenv("APP_KEY")
 app_secret = os.getenv("APP_SECRET")
 base_path = os.getenv("MOBVOI_MCP_BASE_PATH")
+region = os.getenv("MOBVOI_MCP_REGION")
 print("base_path", base_path)
 if not app_key:
-    raise ValueError("Mobvoi_MCP_APP_KEY environment variable is required")
+    raise ValueError("APP_KEY environment variable is required")
 if not app_secret:
-    raise ValueError("Mobvoi_MCP_APP_SECRET environment variable is required")
-
-custom_client = httpx.Client(
-    timeout=10
-)
-
-# increase timeout for async client
-async_custom_client = httpx.AsyncClient(
-    timeout=httpx.Timeout(30.0, connect=60.0, read=30.0)
-)
-
-# sync client instance
-client = Mobvoi(
-    app_key = app_key,
-    app_secret = app_secret,
-    httpx_client = custom_client
-)
-
-# async client instance
-async_client = Mobvoi(
-    app_key = app_key,
-    app_secret = app_secret,
-    httpx_client = async_custom_client
-)
+    raise ValueError("APP_SECRET environment variable is required")
+if not region:
+    region = "mainland"
 
 mcp = FastMCP("Mobvoi")
+
+api_client = ApiClient(app_key, app_secret, region)
+language_table = LanguageTable()
 
 class RateLimiter:
     def __init__(self, rate_limit: int, time_window: float = 1.0):
@@ -118,7 +95,7 @@ _RATE_LIMITER = RateLimiter(rate_limit=5)
         Text content with the path to the output file and name of the speaker used.
     """
 )
-async def text_to_speech(
+def text_to_speech(
     text: str,
     speaker: str = "xiaoyi_meet",
     audio_type: str = "mp3",
@@ -129,53 +106,7 @@ async def text_to_speech(
     streaming: bool = False,
     output_directory: typing.Optional[str] = None,
 ):
-    logger.info(f"text_to_speech is called.")
-    
-    logger.info(f"Received text_to_speech call: text={text}, speaker={speaker}, audio_type={audio_type}")
-    
-    if text == "":
-        make_error("Text is required.")
-    
-    output_path = make_output_path(output_directory, base_path)
-    output_file_name = make_output_file("tts", speaker, output_path, "mp3")
-    
-    logger.info(f"Output path: {output_path / output_file_name}")
-    
-    async with _RATE_LIMITER:  # Use the rate limiter to control the request rate
-        try:
-            audio_data = await async_client.async_speech_generate(
-                text=text,
-                speaker=speaker,
-                audio_type=audio_type,
-                speed=speed,
-                rate=rate,
-                volume=volume,
-                pitch=pitch,
-                streaming=streaming
-            )
-            logger.info(f"Received audio_data: {len(audio_data)} bytes")
-            if len(audio_data) < 100:
-                logger.error(f"Invalid audio data: {audio_data}")
-                raise RuntimeError(f"Mobvoi MCP returned invalid data: {len(audio_data)} bytes")
-            
-        
-            with open(output_path / output_file_name, "wb") as f:
-                f.write(audio_data)
-                logger.info(f"Audio file written: {output_path / output_file_name}")
-        
-            return TextContent(
-                type="text",
-                text=f"Success. File saved as: {output_path / output_file_name}. Speaker used: {speaker}",
-            )
-        except httpx.HTTPStatusError as e:
-            logger.error(f"Mobvoi MCP API error: {e.response.text}")
-            raise RuntimeError(f"Mobvoi MCP API failed: {e.response.text}")
-        except httpx.RequestError as e:
-            logger.error(f"Network error: {str(e)}")
-            raise RuntimeError(f"Network error: {str(e)}")
-        except Exception as e:
-            logger.exception(f"Error in text_to_speech: {str(e)}")
-            raise
+    return TextContent(type="text", text="Not implemented yet.")
 
 @mcp.tool(
     description="""The voice_clone service of Mobvoi. Clone a voice from a given url or local audio file. This tool will return a speaker id which can be used in text_to_speech tool.
@@ -187,79 +118,180 @@ async def text_to_speech(
         audio_file (str): The path or url of the audio file to clone.
     """
 )
-async def voice_clone(is_url: bool, audio_file: str):
-    logger.info(f"voice_clone is called.")
-    
-    async with _RATE_LIMITER:
-        try:
-            speaker = await async_client.async_voice_clone(is_url=is_url, audio_file=audio_file)
-            return TextContent(
-                type="text",
-                text=f"Success. Speaker id: {speaker}",
-            )
-        except Exception as e:
-            logger.exception(f"Error in voice_clone: {str(e)}")
-            raise
+def voice_clone(is_url: bool, audio_file: str):
+    return TextContent(type="text", text="Not implemented yet.")
 
 @mcp.tool(description="Play an audio file. Supports WAV and MP3 formats.")
 def play_audio(input_file_path: str) -> TextContent:
-    file_path = handle_input_file(input_file_path)
-    play(open(file_path, "rb").read(), use_ffmpeg=False)
-    return TextContent(type="text", text=f"Successfully played audio file: {file_path}")
+    return TextContent(type="text", text="Not implemented yet.")
+
 
 @mcp.tool(
     description="""Generate a video from a given image URL and an audio URL. If a person is in the image, the video will be a talking head video, driven by the audio.
     It will consume some time to generate the video, wait with patience.
-    It will return a text message indicating that the task is completed and the video is saved to the output directory.
+    It will return a text message indicating that the task is submitted successfully, task id will be returned.
+    After getting the task id, you may use the query_photo_drive_avatar tool to query the result of the task.
+    
     ⚠️ COST WARNING: This tool makes an API call to Mobvoi which may incur costs. Only use when explicitly requested by the user.
 
     Args:
         image_url: The URL of the image to use in the video.
         audio_url: The URL of the audio to use in the video.
-        output_dir: The directory to save the generated video, you can send the absolute path of the current working directory.
-                    The result will be saved into $output_dir/image_to_video/$task_id/result.mp4.
 
     Returns:
-        A text message indicating the success of the video generation task.
+        A text message indicating the success of the video generation task, task id will be returned if success.
     """
 )
-def image_to_video(image_url: str, audio_url: str, output_dir: str):
-    logger.info(f"image_to_video is called.")
+def photo_drive_avatar(image_url: str, audio_url: str):
+    logger.info(f"photo_drive_avatar is called.")
 
+    request = {
+        "imageUrl": image_url,
+        "audioUrl": audio_url
+    }
     try:
-        video_path, result_url = client.image_to_video(image_url=image_url, audio_url=audio_url, output_dir=output_dir)
-        return TextContent(type="text", text=f"Success. Video saved as: {video_path}. Result url: {result_url}")
+        res = api_client.post("avatar.photo_drive_avatar", request)
+        if res is None:
+            raise Exception("Failed to call photo drive avatar service")
+        task_id = res.get("data", None)
+        if task_id is None:
+            raise Exception("Failed to get task id")
     except Exception as e:
-        logger.exception(f"Error in image_to_video: {str(e)}")
-        raise
+        logger.exception(f"Error in photo_drive_avatar: {str(e)}")
+        return TextContent(type="text", text=f"Error: {str(e)}")
+    
+    return TextContent(type="text", text=f"Success. Task id: {task_id}")
 
+@mcp.tool(
+    description="""Query the result of the photo drive avatar task.
+    It will return a text message indicating that the task is completed and the video is saved to the output directory.
+    If the output directory is not specified, only result url will be returned.
+
+    If the return status indiacting the task is still running, you may use this tool again after a while.
+
+    Args:
+        task_id: The task id of the photo drive avatar task.
+        output_dir: The directory to save the generated video, you can send the absolute path of the current working directory.
+                    The result will be saved into $output_dir/$task_id/result.mp4.
+
+    Returns:
+        A text message indicating the status of the task.
+        Result url will be returned if success, saved path will be returned if output directory is specified.
+    """
+)
+def query_photo_drive_avatar(task_id: str, output_dir: str = ""):
+    logger.info(f"query_photo_drive_avatar is called.")
+    try:
+        response = api_client.get("avatar.query_photo_drive_avatar", path=task_id)
+        res = response.get("data", None)
+        logger.info(f"query_photo_drive_avatar response: {res}")
+        if res is None:
+            raise Exception("Failed to call photo drive avatar result service")
+        status = res.get("status", None)
+        if status == "suc":
+            result_url = res.get("resultUrl", None)
+            if output_dir != "":
+                output_path = os.path.join(output_dir, f"{task_id}.mp4")
+                os.makedirs(output_dir, exist_ok=True)
+                download_file(result_url, output_path)
+                return TextContent(type="text", text=f"Success. Result url: {result_url}. Result saved as: {output_path}")
+            else:
+                return TextContent(type="text", text=f"Success. Result url: {result_url}")
+        elif status == "ing":
+            return TextContent(type="text", text=f"Task {task_id} is still running, please wait for a while.")
+        else:
+            raise Exception(f"Task {task_id} failed with status: {status}, message: {res.get('msg', 'Unknown error')}")
+    except Exception as e:
+        logger.exception(f"Error in query_photo_drive_avatar: {str(e)}")
+        return TextContent(type="text", text=f"Error: {str(e)}")
 
 @mcp.tool(
     description="""This tool aims to perform the voice over task, which generates a video from a given video URL and an audio URL.
     The result video will be a talking head video, with lip sync driven by the audio.
     It will consume some time to generate the video, wait with patience.
-    It will return a text message indicating that the task is completed and the video is saved to the output directory.
+    It will return a text message indicating that the task is submitted successfully, task id will be returned.
+    After getting the task id, you may use the query_video_dubbing tool to query the result of the task.
+
     ⚠️ COST WARNING: This tool makes an API call to Mobvoi which may incur costs. Only use when explicitly requested by the user.
 
     Args:
         video_url: The URL of the video to use as the base.
         audio_url: The URL of the audio to use in the video.
-        output_dir: The directory to save the generated video, you can send the absolute path of the current working directory.
-                    The result will be saved into $output_dir/image_to_video/$task_id/result.mp4.
 
     Returns:
         A text message indicating the success of the video generation task.
     """
 )
-def voice_over(video_url: str, audio_url: str, output_dir: str):
-    logger.info(f"voice_over is called.")
+def video_dubbing(video_url: str, audio_url: str):
+    logger.info(f"video_dubbing is called.")
+
+    request = {
+        "videoUrl": video_url,
+        "wavUrl": audio_url
+    }
 
     try:
-        video_path, cover_image_path, result_url, cover_image_url = client.voice_over(video_url=video_url, audio_url=audio_url, output_dir=output_dir)
-        return TextContent(type="text", text=f"Success. Video saved as: {video_path}. Result url: {result_url}. Cover image saved as: {cover_image_path}. Cover image url: {cover_image_url}.")
+        res = api_client.post("avatar.video_dubbing", request)
+        logger.info(f"video_dubbing response: {res}")
+        if res is None:
+            raise Exception("Failed to call video dubbing service")
+        task_id = res.get("data", None)
+        if task_id is None:
+            raise Exception("Failed to get task id")
     except Exception as e:
-        logger.exception(f"Error in voice_over: {str(e)}")
-        raise
+        logger.exception(f"Error in video_dubbing: {str(e)}")
+        return TextContent(type="text", text=f"Error: {str(e)}")
+    
+    return TextContent(type="text", text=f"Success. Task id: {task_id}")
+
+@mcp.tool(
+    description="""Query the result of the video dubbing task.
+    It will return a text message indicating that the task is completed and the video is saved to the output directory.
+    If the output directory is not specified, only result url will be returned.
+
+    If the return status indiacting the task is still running, you may use this tool again after a while.
+
+    Args:
+        task_id: The task id of the video dubbing task.
+        output_dir: The directory to save the generated video, you can send the absolute path of the current working directory.
+                    The result will be saved into $output_dir/$task_id/result.mp4.
+
+    Returns:
+        A text message indicating the status of the task.
+        Result url will be returned if success, saved path will be returned if output directory is specified.
+"""
+)
+def query_video_dubbing(task_id: str, output_dir: str = ""):
+    logger.info(f"query_video_dubbing is called.")
+
+    task_id_req = {
+        "taskId": task_id,
+        "taskUuid": task_id
+    }
+
+    try:
+        response = api_client.get("avatar.query_video_dubbing", request=task_id_req)
+        res = response.get("data", None)
+        logger.info(f"query_video_dubbing response: {res}")
+        if res is None:
+            raise Exception("Failed to query video dubbing result.")
+        status = res.get("status", None)
+        if status == "suc":
+            result_url = res.get("resultUrl", None)
+            if output_dir != "":
+                output_path = os.path.join(output_dir, f"{task_id}.mp4")
+                os.makedirs(output_dir, exist_ok=True)
+                download_file(result_url, output_path)
+                return TextContent(type="text", text=f"Success. Result url: {result_url}. Result saved as: {output_path}")
+            else:
+                return TextContent(type="text", text=f"Success. Result url: {result_url}")
+        elif status == "ing":
+            return TextContent(type="text", text=f"Task {task_id} is still running, please wait for a while.")
+        else:
+            raise Exception(f"Task {task_id} failed with status: {status}, message: {res.get('msg', 'Unknown error')}")
+    except Exception as e:
+        logger.exception(f"Error in query_video_dubbing: {str(e)}")
+        return TextContent(type="text", text=f"Error: {str(e)}")
 
 @mcp.tool(
     description="""Get a list of supported languages for video translation.
@@ -280,8 +312,9 @@ def voice_over(video_url: str, audio_url: str, output_dir: str):
 )
 def video_translate_language_list():
     logger.info(f"video_translate_language_list is called.")
-    language_list = client.video_translate_get_language_list()
-    return TextContent(type="text", text=language_list)
+    language_list = language_table.get_language_list()
+    language_list_str = "\n".join([f"{language.name} ({language.code}), {language.is_src}, {language.is_target}" for language in language_list])
+    return TextContent(type="text", text=language_list_str)
 
 def main():
     logger.info("Starting MCP server")
