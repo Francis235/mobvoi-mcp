@@ -19,7 +19,7 @@ def is_file_writeable(path: Path) -> bool:
     return os.access(parent_dir, os.W_OK)
 
 def make_output_file(
-    tool: str, text: str, output_path: Path, extension: str, full_id: bool = False
+    tool: str, text: str, output_path: Path, extension: str, full_id: bool = True
 ) -> Path:
     id = text if full_id else text[:8]
 
@@ -108,9 +108,9 @@ def try_find_similar_files(
     return filtered_files
 
 def handle_input_file(file_path: str, audio_content_check: bool = True) -> Path:
-    if not os.path.isabs(file_path) and not os.environ.get("ELEVENLABS_MCP_BASE_PATH"):
+    if not os.path.isabs(file_path) and not os.environ.get("MOBVOI_MCP_BASE_PATH"):
         make_error(
-            "File path must be an absolute path if ELEVENLABS_MCP_BASE_PATH is not set"
+            "File path must be an absolute path if MOBVOI_MCP_BASE_PATH is not set"
         )
     path = Path(file_path)
     if not path.exists() and path.parent.exists():

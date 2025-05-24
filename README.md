@@ -27,6 +27,7 @@
 
 Mobvoi MCP now provides the following tools for Clients to invoke.
 
+
 | tool                     | description                                                                                          |
 | ------------------------ | ---------------------------------------------------------------------------------------------------- |
 | get_speaker_list         | List all voices available                                                                            |
@@ -51,7 +52,8 @@ Go to Cursor -> Cursor Settings -> MCP, click `Add new global MCP server`, and m
         "env": {
           "APP_KEY": "<insert-your-APP_KEY-here>",
           "APP_SECRET": "<insert-your-APP_SECRET-here>",
-          "MOBVOI_MCP_REGION": "<insert-your-region-here>"
+          "MOBVOI_MCP_REGION": "optional, mainland is default, choose from mainland | global",
+          "MOBVOI_MCP_BASE_PATH": "optional, ~/Desktop is default" 
         },
       },
 ```
@@ -69,7 +71,8 @@ Go to Claude Desktop -> Settings -> Developer, click `Edit Config` and open `cla
         "env": {
           "APP_KEY": "<insert-your-APP_KEY-here>",
           "APP_SECRET": "<insert-your-APP_SECRET-here>",
-          "MOBVOI_MCP_REGION": "<insert-your-region-here>"
+          "MOBVOI_MCP_REGION": "optional, mainland is default, choose from mainland | global",
+          "MOBVOI_MCP_BASE_PATH": "optional, ~/Desktop is default"
         },
       },
 ```
@@ -87,7 +90,8 @@ Install Cline extension on VSCode EXTENSIONS, and go to Cline -> MCP Servers -> 
         "env": {
           "APP_KEY": "<insert-your-APP_KEY-here>",
           "APP_SECRET": "<insert-your-APP_SECRET-here>",
-          "MOBVOI_MCP_REGION": "<insert-your-region-here>"
+          "MOBVOI_MCP_REGION": "optional, mainland is default, choose from mainland | global",
+          "MOBVOI_MCP_BASE_PATH": "optional, ~/Desktop is default"
         },
         "transportType": "stdio"
       },
@@ -113,7 +117,8 @@ If you want to conduct tests based on the source code or perform secondary devel
       "env": {
           "APP_KEY": "<insert-your-APP_KEY-here>",
           "APP_SECRET": "<insert-your-APP_SECRET-here>",
-          "MOBVOI_MCP_REGION": "<insert-your-region-here>"
+          "MOBVOI_MCP_REGION": "optional, mainland is default, choose from mainland | global",
+          "MOBVOI_MCP_BASE_PATH": "optional, ~/Desktop is default"
       },
       "transportType": "stdio"
     },
@@ -124,7 +129,7 @@ Take Cline as an example, and the configuration of other clients is similar.
 ## Example usage
 
 1. TTS Demo video:
-    ![MCP TTS Demo](https://raw.githubusercontent.com/mobvoi/mobvoi-mcp/master/.assets/MCP-TTS-Demo.gif)
+   ![MCP TTS Demo](https://raw.githubusercontent.com/mobvoi/mobvoi-mcp/master/.assets/MCP-TTS-Demo.gif)
 
 ## Troubleshooting
 
@@ -173,4 +178,3 @@ At the same time, you can refer to the following configuration to update and cle
        ...
       },
 ```
-
