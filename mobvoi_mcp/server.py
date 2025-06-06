@@ -112,7 +112,7 @@ def get_speaker_list(voice_type: str = "all"):
 )
 def text_to_speech(
     text: str,
-    speaker: str = "xiaoyi_meet",
+    speaker: str = "xiaoyi_meet_24k",
     audio_type: str = "mp3",
     speed: float = 1.0,
     rate: int = 24000,
